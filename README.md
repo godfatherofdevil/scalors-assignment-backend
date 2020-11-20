@@ -1,3 +1,32 @@
+# run instruction:
+`git clone git@github.com:godfatherofdevil/scalors-assignment-backend.git`  
+`cd scalors-assignment-backend/clinomics`  
+`python -m venv .venv`   
+`source .venv/bin/activate`   
+`pip install -r requirements.txt`   
+`python manage.py test todo`
+
+urls:   
+api/v1/board [name='boardList']   
+api/v1/board<drf_format_suffix:format> [name='boardList']   
+api/v1/board/<int:pk> [name='boardDetail']   
+api/v1/board/<int:pk><drf_format_suffix:format> [name='boardDetail']   
+api/v1/board/<int:pk>/todo [name='todoList']   
+api/v1/board/<int:pk>/todo<drf_format_suffix:format> [name='todoList']   
+api/v1/board/<int:pk>/todo/<int:id> [name='todoDetail']   
+api/v1/board/<int:pk>/todo/<int:id><drf_format_suffix:format> [name='todoDetail']   
+api/v1/users [name='userList']   
+api/v1/users<drf_format_suffix:format> [name='userList']   
+api/v1/users/<int:pk> [name='userDetail']   
+api/v1/users/<int:pk><drf_format_suffix:format> [name='userDetail']   
+api/v1/reminders [name='reminderList']   
+api/v1/reminders<drf_format_suffix:format> [name='reminderList']   
+api/v1/reminders/<int:pk> [name='reminderDetail']   
+api/v1/reminders/<int:pk><drf_format_suffix:format> [name='reminderDetail']   
+api/v1/email [name='emailCallback']   
+api/v1/email<drf_format_suffix:format> [name='emailCallback']   
+admin/
+
 # Backend Assignment: Simple Todos and Reminder API
 
 The assignment involves the creation of a TODO and Reminder REST JSON API using Django. Please use the following libraries and versions:
