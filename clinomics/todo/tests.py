@@ -2,7 +2,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from rest_framework.test import APITestCase
 from rest_framework import status
-from .models import Board, Todo
+from .models import Board, Todo, Reminder
 
 
 class BoardTest(APITestCase):
@@ -148,3 +148,63 @@ class TodoTest(APITestCase):
         response = self.client.delete(f"{url}/1/todo/1")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Todo.objects.count(), 0)
+
+
+class ReminderTest(APITestCase):
+    def setUp(self) -> None:
+        """
+        setup test environment
+        """
+        self.test_user = User.objects.create_user(username="tempUser", password="temp@123")
+        self.client.force_login(self.test_user)
+
+    def test_reminder_create(self):
+        url = reverse("reminderList")
+        reminder = {
+            "email": "foo@bar.com",
+            "text": "testing foo service.",
+            "delay": 10
+        }
+
+        response = self.client.post(url, data=reminder, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Reminder.objects.count(), 1)
+        self.assertEqual(Reminder.objects.get().email, "foo@bar.com")
+        self.assertEqual(Reminder.objects.get().owner.username, "tempUser")
+
+        # list reminders
+        response = self.client.get(f"{url}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data[0].get("email"), "foo@bar.com")
+
+        another = {
+            "email": "bar@foo.com",
+            "text": "testing bar service.",
+            "delay": 10
+        }
+
+        self.client.post(url, data=another, format="json")
+        self.assertEqual(Reminder.objects.count(), 2)
+
+        # list reminders
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data[0].get("email"), "foo@bar.com")
+        self.assertEqual(response.data[1].get("email"), "bar@foo.com")
+
+    def test_reminder_delete(self):
+        url = reverse("reminderList")
+        reminder = {
+            "email": "foo@bar.com",
+            "text": "testing foo service.",
+            "delay": 10
+        }
+
+        self.client.post(url, data=reminder, format="json")
+        self.assertEqual(Reminder.objects.count(), 1)
+
+        # delete one
+        response = self.client.delete(f"{url}/1")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(Reminder.objects.count(), 0)

@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from .models import Board, Todo
+from .models import Board, Todo, Reminder
 
 
 class BoardSerializer(serializers.ModelSerializer):
@@ -41,4 +41,12 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["id", "username", "board_owner", "todo_owner"]
+
+
+class ReminderSerializer(serializers.ModelSerializer):
+    owner = serializers.ReadOnlyField(source="owner.username")
+
+    class Meta:
+        model = Reminder
+        fields = ["id", "email", "text", "delay", "owner"]
 

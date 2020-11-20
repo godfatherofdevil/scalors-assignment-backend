@@ -28,3 +28,16 @@ class Todo(models.Model):
 
     class Meta:
         ordering = ["created", ]
+
+
+class Reminder(models.Model):
+    email = models.EmailField()
+    text = models.TextField()
+    delay = models.IntegerField()
+    owner = models.ForeignKey("auth.User", related_name="reminder_owner", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.owner.username}: {self.email}: {self.delay}"
+
+    class Meta:
+        ordering = ["delay", ]

@@ -1,9 +1,10 @@
 from django.contrib.auth.models import User
 from rest_framework import generics, permissions
 
-from .models import Board, Todo
+from .models import Board, Todo, Reminder
 from .permissions import IsOwnerOrReadOnly
-from .serializers import BoardDetailSerializer, BoardSerializer, TodoSerializer, UserSerializer
+from .serializers import BoardDetailSerializer, BoardSerializer, TodoSerializer, UserSerializer, \
+    ReminderSerializer
 
 
 class BoardList(generics.ListCreateAPIView):
@@ -56,3 +57,18 @@ class UserList(generics.ListAPIView):
 class UserDetail(generics.RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+
+class ReminderList(generics.ListCreateAPIView):
+    queryset = Reminder.objects.all()
+    serializer_class = ReminderSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, ]
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+
+class ReminderDetail(generics.DestroyAPIView):
+    queryset = Reminder.objects.all()
+    serializer_class = ReminderSerializer
+    permission_classes = [IsOwnerOrReadOnly, ]
