@@ -1,10 +1,13 @@
 from django.contrib.auth.models import User
 from rest_framework import generics, permissions
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 from .models import Board, Todo, Reminder
 from .permissions import IsOwnerOrReadOnly
 from .serializers import BoardDetailSerializer, BoardSerializer, TodoSerializer, UserSerializer, \
     ReminderSerializer
+from .tasks import send_email
 
 
 class BoardList(generics.ListCreateAPIView):
@@ -66,9 +69,25 @@ class ReminderList(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+        send_email.apply_async(
+            (self.request.data.get("email"), self.request.data.get("text")),
+            countdown=self.request.data.get("delay")
+        )
 
 
 class ReminderDetail(generics.DestroyAPIView):
     queryset = Reminder.objects.all()
     serializer_class = ReminderSerializer
     permission_classes = [IsOwnerOrReadOnly, ]
+
+
+@api_view(["POST", ])
+def email_callback(request):
+    email = request.data.get("email")
+    text = request.data.get("text")
+    success = f"email sent to {email}"
+    content = {
+        "email": email, "text": text, "message": success
+    }
+
+    return Response(content, status=200)

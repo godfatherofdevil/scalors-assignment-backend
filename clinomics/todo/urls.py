@@ -11,6 +11,7 @@ urlpatterns = [
     path('api/v1/users/<int:pk>', views.UserDetail.as_view(), name='userDetail'),
     path('api/v1/reminders', views.ReminderList.as_view(), name='reminderList'),
     path('api/v1/reminders/<int:pk>', views.ReminderDetail.as_view(), name='reminderDetail'),
+    path('api/v1/email', views.email_callback, name='emailCallback'),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
