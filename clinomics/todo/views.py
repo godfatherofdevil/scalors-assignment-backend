@@ -71,7 +71,7 @@ class ReminderList(generics.ListCreateAPIView):
         serializer.save(owner=self.request.user)
         send_email.apply_async(
             (self.request.data.get("email"), self.request.data.get("text")),
-            countdown=self.request.data.get("delay")
+            countdown=self.request.data.get("delay") * 60
         )
 
 
